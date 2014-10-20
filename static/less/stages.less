@@ -1,0 +1,140 @@
+/* Stages */
+#container {
+    overflow: hidden;
+    padding: 40px 0;
+}
+.title {
+    @media(min-width:@screen-md){
+        font-size: 50px;
+    }
+    position: relative;
+    text-align: center;
+    color: yellow;
+    font-weight: bold;
+    text-shadow: 2px 2px 5px blue, 1px 1px 1px #fff;
+    transition: all 0.5s ease;
+}
+.credits {
+    position: relative;
+    text-align: center;
+    transition: all 0.5s ease;
+}
+.content {
+    padding: 40px 0;
+}
+/* Intro */
+#racing {
+    height: 44px;
+    background: url(../img/racing.png) no-repeat center center;
+    position: relative;
+    left: -150%;
+    transition: all 1s ease;
+}
+#tank {
+    height: 55px;
+    background: url(../img/tank.png) no-repeat center center;
+    position: relative;
+    left: 250%;
+    transition: all 1s ease;
+}
+.content[data-stage=intro] .btn-start {
+    padding: 10px 30px;
+}
+/* ChooseName */
+.content[data-stage=choosename] {
+    text-align: center;
+    label {
+        display: block;
+        font-size: 1.2em;
+        margin-bottom: 20px;
+    }
+    input {
+        border-radius: 5px;
+        height: 50px;
+        width: 250px;
+        color: #000;
+    }
+    a.fa {
+        margin: auto;
+        margin-top: 20px;
+    }
+}
+/* ChooseVehicle */
+.content[data-stage=choosevehicle] {
+    text-align: center;
+    .vehicle-title {
+        font-size: 16px;
+    }
+    .showcase {
+        margin: auto;
+        .glyphicon {
+            font-size: 30px;
+        }
+        .showcase-slider {
+            position: relative;
+            margin: auto;
+            margin-bottom: 20px;
+            border: 2px solid #222;
+            border-radius: 10px;
+            .box-sizing(content-box);
+            padding: 2px;
+        }
+        .showcase-item {
+            position: absolute;
+            border-radius: 10px;
+            top: 2px;
+            left: 2px;
+            background: transparent;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.5s ease;
+            #gradient > .radial(#333; #000);
+        }
+        .specifications {
+            margin: auto;
+            border-collapse: collapse;
+            text-align: left;
+            td, th {
+                padding: 10px;
+            }
+            tr:first-child th:first-child {
+                text-align: center;
+            }
+            .vehicle-name {
+                font-size: 22px;
+                font-style: italic;
+                font-family: Georgia;
+                margin-left: 5px;
+            }
+            .scale {
+                height: 14px;
+                width: 100px;
+                background: #333;
+                border: 1px solid #000;
+                div {
+                    height: 12px;
+                }
+            }
+            .speed .scale div {
+                background: red;
+            }
+            .acceleration .scale div {
+                background: yellow;
+            }
+            .steering .scale div {
+                background: lightblue;
+            }
+        }
+        .slide-active {
+            z-index: 5;
+            opacity: 1;
+        }
+        .slide-prev {
+            z-index: 4;
+        }
+        .slide {
+            z-index: 0;
+        }
+    }
+}
+
