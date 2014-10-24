@@ -7598,10 +7598,16 @@ canvas {
     font-size: 50px;
   }
 }
-.credits {
+.author {
   position: relative;
   text-align: center;
   transition: all 0.5s ease;
+}
+.more {
+  position: relative;
+  text-align: center;
+  transition: all 0.5s ease;
+  font-size: 11px;
 }
 .content {
   padding: 40px 0;
@@ -7679,6 +7685,8 @@ canvas {
   background-image: -webkit-radial-gradient(circle, #333333, #000000);
   background-image: radial-gradient(circle, #333333, #000000);
   background-repeat: no-repeat;
+  height: 280px;
+  width: 280px;
 }
 .content[data-stage=choosevehicle] .showcase .specifications {
   margin: auto;
@@ -7700,7 +7708,7 @@ canvas {
 }
 .content[data-stage=choosevehicle] .showcase .specifications .scale {
   height: 14px;
-  width: 100px;
+  width: 50px;
   background: #333;
   border: 1px solid #000;
 }
@@ -7724,6 +7732,58 @@ canvas {
   z-index: 4;
 }
 .content[data-stage=choosevehicle] .showcase .slide {
+  z-index: 0;
+}
+/* ChooseTrack */
+.content[data-stage=choosetrack] {
+  text-align: center;
+}
+.content[data-stage=choosetrack] .track-title {
+  font-size: 16px;
+  color: #ffff00;
+}
+.content[data-stage=choosetrack] .showcase {
+  margin: auto;
+}
+.content[data-stage=choosetrack] .showcase .glyphicon {
+  font-size: 30px;
+}
+.content[data-stage=choosetrack] .showcase .showcase-slider {
+  position: relative;
+  margin: auto;
+  margin-bottom: 20px;
+  border: 2px solid #222;
+  border-radius: 10px;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  padding: 2px;
+  width: 280px;
+  height: 300px;
+}
+.content[data-stage=choosetrack] .showcase .showcase-item {
+  position: absolute;
+  border-radius: 10px;
+  top: 2px;
+  left: 2px;
+  background: transparent;
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.5s ease;
+  background-image: -webkit-radial-gradient(circle, #333333, #000000);
+  background-image: radial-gradient(circle, #333333, #000000);
+  background-repeat: no-repeat;
+  width: 280px;
+  height: 300px;
+}
+.content[data-stage=choosetrack] .showcase .slide-active {
+  z-index: 5;
+  opacity: 1;
+}
+.content[data-stage=choosetrack] .showcase .slide-prev {
+  z-index: 4;
+}
+.content[data-stage=choosetrack] .showcase .slide {
   z-index: 0;
 }
 #container.game {
@@ -7761,4 +7821,10 @@ canvas {
 }
 #container.ranking .content[data-stage=ranking] h2 {
   color: yellow;
+}
+body.credits {
+  padding: 40px;
+}
+body.changelog {
+  padding: 40px;
 }

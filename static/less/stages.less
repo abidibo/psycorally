@@ -14,10 +14,16 @@
     text-shadow: 2px 2px 5px blue, 1px 1px 1px #fff;
     transition: all 0.5s ease;
 }
-.credits {
+.author {
     position: relative;
     text-align: center;
     transition: all 0.5s ease;
+}
+.more {
+    position: relative;
+    text-align: center;
+    transition: all 0.5s ease;
+    font-size: 11px;
 }
 .content {
     padding: 40px 0;
@@ -89,6 +95,8 @@
             opacity: 0;
             transition: all 0.5s ease;
             #gradient > .radial(#333; #000);
+            height: 280px;
+            width: 280px;
         }
         .specifications {
             margin: auto;
@@ -108,7 +116,7 @@
             }
             .scale {
                 height: 14px;
-                width: 100px;
+                width: 50px;
                 background: #333;
                 border: 1px solid #000;
                 div {
@@ -124,6 +132,55 @@
             .steering .scale div {
                 background: lightblue;
             }
+        }
+        .slide-active {
+            z-index: 5;
+            opacity: 1;
+        }
+        .slide-prev {
+            z-index: 4;
+        }
+        .slide {
+            z-index: 0;
+        }
+    }
+}
+
+/* ChooseTrack */
+.content[data-stage=choosetrack] {
+    text-align: center;
+    .track-title {
+        font-size: 16px;
+        color: #ffff00;
+    }
+    .showcase {
+        margin: auto;
+        .glyphicon {
+            font-size: 30px;
+        }
+        .showcase-slider {
+            position: relative;
+            margin: auto;
+            margin-bottom: 20px;
+            border: 2px solid #222;
+            border-radius: 10px;
+            .box-sizing(content-box);
+            padding: 2px;
+            width: 280px;
+            height: 300px;
+        }
+        .showcase-item {
+            position: absolute;
+            border-radius: 10px;
+            top: 2px;
+            left: 2px;
+            background: transparent;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.5s ease;
+            #gradient > .radial(#333; #000);
+            width: 280px;
+            height: 300px;
         }
         .slide-active {
             z-index: 5;

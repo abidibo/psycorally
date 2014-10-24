@@ -18,36 +18,73 @@ PsycoRally.Vehicle = function() {
         this.velocity = 0;
     };
 
+    /**
+     * These are suitable values, then every Vehicle instance provides its own
+     */
     this.terrain_specifications = {
+        // constant acceleration motion with vmax (acceleration depends on velocity) in a dt interval
+        // acceleration decreases with velocity
+        // constant angular acceleration
+        // angular velocity depends on linear velocity (less steering with more speed)
+        // linear friction (proportional to velocity)
+        // angular friction
         road: {
-            v_max: 800,
-            v_back_max: 200,
-            a_max: 30,
-            a_back_max: 30,
-            a_break: 40,
-            // acceleration decreases with velocity
-            linear_forward: function(v) { return  this.a_max - Math.abs(this.a_max * v / this.v_max);  },
-            linear_reverse: function(v) { return  this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max);  },
-            angular: Math.PI / 60,
+            v_max: 14, // px / 16 ms
+            v_back_max: 2,
+            a_max: 0.6,
+            a_back_max: 1,
+            a_break: 0.5,
+            dx: function(v, a, dt) { return v*dt + a*dt*dt },
+            dv: function(a, dt) { return a*dt },
+            a: function(v) { return this.a_max - Math.abs(this.a_max * v / this.v_max) },
+            a_back: function(v) { return this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max); },
+            omega: function(v) { return Math.PI / (50 + 2 * Math.abs(v)); },
+            dteta: function(dt, v) { return this.omega(v) * dt },
             // friction increases with velocity
-            linear_d: function(v) { return 10 + Math.abs(0.02 * v); },
-            angular_d: Math.PI / 160
+            a_friction: function(dt, v) { return Math.abs(0.04 * v) * dt; },
+            omega_friction: Math.PI / 160,
+            teta_friction: function(dt) { return this.omega_friction * dt; }
         },
-        grass: {
-            v_max: 90,
-            v_back_max: 50,
-            a_max: 20,
-            a_back_max: 20,
-            a_break: 1000,
-            linear_forward: function(v) { return  this.a_max - Math.abs(this.a_max * v / this.v_max);  },
-            linear_reverse: function(v) { return  this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max);  },
-            angular: Math.PI / 60,
-            linear_d: function(v) { return Math.abs(0.2 * v); },
-            angular_d: Math.PI / 160
+        dirt: {
+            v_max: 2,
+            v_back_max: 4,
+            a_max: 0.5,
+            a_back_max: 1,
+            a_break: 0.1,
+            dx: function(v, a, dt) { return v*dt + a*dt*dt },
+            dv: function(a, dt) { return a*dt },
+            a: function(v) { return this.a_max - Math.abs(this.a_max * v / this.v_max) },
+            a_back: function(v) { return this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max); },
+            omega: function(v) { return Math.PI / (40 + 4 * Math.abs(v)); },
+            dteta: function(dt, v) { return this.omega(v) * dt },
+            // friction increases with velocity
+            a_friction: function(dt, v) { return Math.abs(0.01 * v) * dt; },
+            omega_friction: Math.PI / 160,
+            teta_friction: function(dt) { return this.omega_friction * dt; }
+        },
+        water: {
+            v_max: 1,
+            v_back_max: 1,
+            a_max: 0.2,
+            a_back_max: 0.2,
+            a_break: 0.1,
+            dx: function(v, a, dt) { return v*dt + a*dt*dt },
+            dv: function(a, dt) { return a*dt },
+            a: function(v) { return this.a_max - Math.abs(this.a_max * v / this.v_max) },
+            a_back: function(v) { return this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max); },
+            omega: function(v) { return Math.PI / (90 + 4 * Math.abs(v)); },
+            dteta: function(dt, v) { return this.omega(v) * dt },
+            // friction increases with velocity
+            a_friction: function(dt, v) { return Math.abs(1 * v) * dt; },
+            omega_friction: Math.PI / 160,
+            teta_friction: function(dt) { return this.omega_friction * dt; }
         },
     };
+    // img prefix. img names are in the form prefix + dir, ie car-sse
     this.texture_prefix = 'car-';
+    // half angular portion for each texture
     this.texture_midrange = Math.PI / 32;
+    // which texture corresponds to the given angle?
     this.textures = {
         s: 0,
         sssse: Math.PI / 16,
@@ -114,68 +151,48 @@ PsycoRally.Vehicle = function() {
     /**
      * Calculates velocity vector and texture
      */
-    this.getMovementData = function(keys, terrain) {
-        // fwd
-        // accelerating
-        if(this.velocity >= 0 && keys.up) {
-            this.velocity += this.terrain_specifications[terrain].linear_forward(this.velocity);
-        }
-        // breaking
-        if(this.velocity >= 0 && keys.down) {
-            this.velocity -= this.terrain_specifications[terrain].a_break;
-        }
-        // rwd
-        if(this.velocity <= 0 && keys.down) {
-            this.velocity -= this.terrain_specifications[terrain].linear_reverse(this.velocity);
-        }
-        // breaking
-        if(this.velocity <= 0 && keys.up) {
-            this.velocity += this.terrain_specifications[terrain].a_break;
-        }
+    this.getMovementData = function(deltat, keys, terrain) {
 
-        // natural deceleration
-        if(!keys.down && !keys.up) {
-            var new_velocity = this.velocity - (this.velocity > 0 ? 1 : -1) * this.terrain_specifications[terrain].linear_d(this.velocity);
-            this.velocity = this.velocity > 0
-                ? (new_velocity > 0 ? Math.floor(new_velocity) : 0)
-                : (new_velocity < 0 ? Math.ceil(new_velocity) : 0);
-        }
+        // with fast processors dt is 1ms
+        var dt = deltat / 16; // 60 fps => 16 ms
 
+        // angular
         if(keys.right && this.velocity != 0) {
-            this.angular -= this.terrain_specifications[terrain].angular;
+            this.angular -= this.terrain_specifications[terrain].dteta(dt, this.velocity);
         }
         if(keys.left && this.velocity != 0) {
-            this.angular += this.terrain_specifications[terrain].angular;
+            this.angular += this.terrain_specifications[terrain].dteta(dt, this.velocity);
         }
 
-        // natural deceleration
-        if(this.angular != 0) {
+        // angular friction
+        if(this.angular != 0 && !keys.left && !keys.right) {
             for(d in this.textures) {
                 var top_limit = this.textures[d] + this.texture_midrange;
                 var bottom_limit = this.textures[d] - this.texture_midrange;
                 if(bottom_limit < 0 && (this.angular > 2 * Math.PI + bottom_limit || this.angular < top_limit)) {
                     if(this.angular > 0 && this.angular <= this.texture_midrange) {
-                        new_angular = this.angular - this.terrain_specifications[terrain].angular_d;
+                        new_angular = this.angular - this.terrain_specifications[terrain].teta_friction(dt);
                         this.angular = new_angular > 0 ? new_angular : 0;
                     }
                     else {
-                        new_angular = this.angular + this.terrain_specifications[terrain].angular_d;
+                        new_angular = this.angular + this.terrain_specifications[terrain].teta_friction(dt);
                         this.angular = new_angular < 2 * Math.PI ? new_angular : 0;
                     }
                 }
                 else if(this.angular >= bottom_limit && this.angular < top_limit) {
                     if(this.angular > this.textures[d]) {
-                        new_angular = this.angular - this.terrain_specifications[terrain].angular_d;
+                        new_angular = this.angular - this.terrain_specifications[terrain].teta_friction(dt);
                         this.angular = new_angular > this.textures[d] ? new_angular : this.textures[d];
                     }
                     else if(this.angular < this.textures[d]) {
-                        new_angular = this.angular + this.terrain_specifications[terrain].angular_d;
+                        new_angular = this.angular + this.terrain_specifications[terrain].teta_friction(dt);
                         this.angular = new_angular < this.textures[d] ? new_angular : this.textures[d];
                     }
                 }
             }
         }
 
+        // normalize angular
         if(this.angular < 0) {
             this.angular = 2 * Math.PI + this.angular;
         }
@@ -183,9 +200,48 @@ PsycoRally.Vehicle = function() {
             this.angular -= 2 * Math.PI;
         }
 
+        var acceleration = 0;
+        // fwd
+        if(this.velocity > 0 || (this.velocity == 0 && keys.up)) {
+            if(keys.up) {
+                acceleration = this.terrain_specifications[terrain].a(this.velocity);
+            }
+            if(keys.down) {
+                acceleration = -this.terrain_specifications[terrain].a_break;
+            }
+        }
+        else if(this.velocity < 0 || (this.velocity == 0 && keys.down)) {
+            if(keys.down) {
+                acceleration = -this.terrain_specifications[terrain].a_back(this.velocity);
+            }
+            if(keys.up) {
+                acceleration = this.terrain_specifications[terrain].a(0);
+            }
+        }
+
+        // friction
+        if(!keys.down && !keys.up) {
+            acceleration = (this.velocity > 0 ? -1 : +1) * this.terrain_specifications[terrain].a_friction(dt, this.velocity);
+        }
+
+        // velocity increment
+        var dv = this.terrain_specifications[terrain].dv(acceleration, dt);
+        // space increment
+        var dx = this.terrain_specifications[terrain].dx(this.velocity, acceleration, dt);
+
+        // friction is determining motion round velocity to avoid never ending trip to 0
+        if(!keys.down && !keys.up) {
+            this.velocity = this.velocity > 0
+                ? (this.velocity + dv > 0 ? Math.floor((this.velocity + dv) * 1000)/1000 : 0)
+                : (this.velocity + dv < 0 ? Math.ceil((this.velocity + dv) * 1000)/1000 : 0);
+        }
+        else {
+            this.velocity += dv;
+        }
+
         return {
-            vx: this.velocity * Math.sin(this.angular),
-            vy: this.velocity * Math.cos(this.angular),
+            dx: dx * Math.sin(this.angular),
+            dy: dx * Math.cos(this.angular),
             texture: this.getTexture()
         };
 

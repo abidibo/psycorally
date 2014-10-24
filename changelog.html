@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>PsycoRally</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="static/js/mootools.js"></script>
+        <link rel="stylesheet" href="static/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="static/css/styles.css" />
+    </head>
+    <body class="changelog">
+        <h1 class="title">PsycoRally</h1>
+        <p class='author' style="left: 50px;">a game by <a href="http://abidibo.net">abidibo</a></p>
+        <p class="more"><span class="fa fa-github"></span> <a href="http://github.com/abidibo/psycorally" target="_blank">code</a>, <a href="credits.html" target="_blank">credits</a></p>
+        <h2>Changelog</h2>
+        <dl>
+            <dt>Version 0.1.1</dt>
+            <dd>
+                <ul>
+                    <li>Uses my own motion physics to move the vehicle, its spatial coordinates are changed directly.</li>
+                    <li>Can't use framework collision system and separation because the vehicle is not moved by phaser</li>
+                    <li>I wrote a similar collision and separation system. Less precise, but this way lap time is independent from computer performance.</li>
+                    <li>Movement is calculated considering a constant acceleration motion in small dt intervals. Acceleration depends on velocity, decreasing to 0 for v = vmax. Linear and angular frictions are implemented. Linear friction is proportional to velocity, angular friction is constant. Angular motion is uniform, constant angular velocity, a=0.</li>
+                </ul>
+            </dd>
+            <dt>Version 0.1.0</dt>
+            <dd>
+                <ul>
+                    <li>Uses my own physics to set the phaser physics velocity.</li>
+                    <li>Vehicles are moved changing their velocity, the velocity is calculated using polar coordinates in the plane space.</li>
+                    <li>Lap time depends on computer performance since velocity is increased at fps intervals.</li>
+                </ul>
+            </dd>
+    </body>
+</html>

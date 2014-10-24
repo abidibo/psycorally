@@ -1,33 +1,58 @@
 var PsycoRally = PsycoRally || {};
 
 PsycoRally.RacingVehicle = function(name) {
-     this.name = name;
-     this.terrain_specifications = {
+    this.name = name;
+    this.terrain_specifications = {
         road: {
-            v_max: 800,
-            v_back_max: 200,
-            a_max: 40,
-            a_back_max: 30,
-            a_break: 40,
-            // acceleration decreases with velocity
-            linear_forward: function(v) { return  this.a_max - Math.abs(this.a_max * v / this.v_max);  },
-            linear_reverse: function(v) { return  this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max);  },
-            angular: Math.PI / 60,
+            v_max: 14, // px / 16 ms
+            v_back_max: 2,
+            a_max: 0.6,
+            a_back_max: 1,
+            a_break: 0.5,
+            dx: function(v, a, dt) { return v*dt + a*dt*dt },
+            dv: function(a, dt) { return a*dt },
+            a: function(v) { return this.a_max - Math.abs(this.a_max * v / this.v_max) },
+            a_back: function(v) { return this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max); },
+            omega: function(v) { return Math.PI / (50 + 2 * Math.abs(v)); },
+            dteta: function(dt, v) { return this.omega(v) * dt },
             // friction increases with velocity
-            linear_d: function(v) { return 10 + Math.abs(0.02 * v); },
-            angular_d: Math.PI / 160
+            a_friction: function(dt, v) { return Math.abs(0.04 * v) * dt; },
+            omega_friction: Math.PI / 160,
+            teta_friction: function(dt) { return this.omega_friction * dt; }
         },
-        grass: {
-            v_max: 90,
-            v_back_max: 50,
-            a_max: 20,
-            a_back_max: 20,
-            a_break: 1000,
-            linear_forward: function(v) { return  this.a_max - Math.abs(this.a_max * v / this.v_max);  },
-            linear_reverse: function(v) { return  this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max);  },
-            angular: Math.PI / 60,
-            linear_d: function(v) { return Math.abs(0.2 * v); },
-            angular_d: Math.PI / 160
+        dirt: {
+            v_max: 3,
+            v_back_max: 4,
+            a_max: 0.5,
+            a_back_max: 1,
+            a_break: 0.1,
+            dx: function(v, a, dt) { return v*dt + a*dt*dt },
+            dv: function(a, dt) { return a*dt },
+            a: function(v) { return this.a_max - Math.abs(this.a_max * v / this.v_max) },
+            a_back: function(v) { return this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max); },
+            omega: function(v) { return Math.PI / (40 + 4 * Math.abs(v)); },
+            dteta: function(dt, v) { return this.omega(v) * dt },
+            // friction increases with velocity
+            a_friction: function(dt, v) { return Math.abs(0.01 * v) * dt; },
+            omega_friction: Math.PI / 160,
+            teta_friction: function(dt) { return this.omega_friction * dt; }
+        },
+        water: {
+            v_max: 1,
+            v_back_max: 1,
+            a_max: 0.2,
+            a_back_max: 0.2,
+            a_break: 0.1,
+            dx: function(v, a, dt) { return v*dt + a*dt*dt },
+            dv: function(a, dt) { return a*dt },
+            a: function(v) { return this.a_max - Math.abs(this.a_max * v / this.v_max) },
+            a_back: function(v) { return this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max); },
+            omega: function(v) { return Math.PI / (90 + 4 * Math.abs(v)); },
+            dteta: function(dt, v) { return this.omega(v) * dt },
+            // friction increases with velocity
+            a_friction: function(dt, v) { return Math.abs(1 * v) * dt; },
+            omega_friction: Math.PI / 160,
+            teta_friction: function(dt) { return this.omega_friction * dt; }
         },
     };
     this.texture_prefix = 'car-';
@@ -37,15 +62,18 @@ PsycoRally.RacingVehicle = function(name) {
             img: 'racing.png',
             velocity: {
                 road: 80,
-                grass: 20
+                dirt: 40,
+                water: 20
             },
             acceleration: {
-                road: 60,
-                grass: 40
+                road: 70,
+                dirt: 60,
+                water: 20
             },
             steering: {
                 road: 70,
-                grass: 70
+                dirt: 70,
+                water: 20
             }
         };
     };
@@ -57,30 +85,55 @@ PsycoRally.TankVehicle = function(name) {
      this.name = name;
      this.terrain_specifications = {
         road: {
-            v_max: 600,
-            v_back_max: 200,
-            a_max: 40,
-            a_back_max: 30,
-            a_break: 40,
-            // acceleration decreases with velocity
-            linear_forward: function(v) { return  this.a_max - Math.abs(this.a_max * v / this.v_max);  },
-            linear_reverse: function(v) { return  this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max);  },
-            angular: Math.PI / 40,
+            v_max: 6, // px / 16 ms
+            v_back_max: 2,
+            a_max: 0.4,
+            a_back_max: 0.4,
+            a_break: 1,
+            dx: function(v, a, dt) { return v*dt + a*dt*dt },
+            dv: function(a, dt) { return a*dt },
+            a: function(v) { return this.a_max - Math.abs(this.a_max * v / this.v_max) },
+            a_back: function(v) { return this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max); },
+            omega: function(v) { return Math.PI / (30 + 2 * Math.abs(v)); },
+            dteta: function(dt, v) { return this.omega(v) * dt },
             // friction increases with velocity
-            linear_d: function(v) { return 10 + Math.abs(0.02 * v); },
-            angular_d: Math.PI / 160
+            a_friction: function(dt, v) { return Math.abs(0.04 * v) * dt; },
+            omega_friction: Math.PI / 160,
+            teta_friction: function(dt) { return this.omega_friction * dt; }
         },
-        grass: {
-            v_max: 700,
-            v_back_max: 50,
-            a_max: 40,
-            a_back_max: 20,
-            a_break: 1000,
-            linear_forward: function(v) { return  this.a_max - Math.abs(this.a_max * v / this.v_max);  },
-            linear_reverse: function(v) { return  this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max);  },
-            angular: Math.PI / 40,
-            linear_d: function(v) { return Math.abs(0.2 * v); },
-            angular_d: Math.PI / 160
+        dirt: {
+            v_max: 9, // px / 16 ms
+            v_back_max: 2,
+            a_max: 0.8,
+            a_back_max: 0.4,
+            a_break: 1,
+            dx: function(v, a, dt) { return v*dt + a*dt*dt },
+            dv: function(a, dt) { return a*dt },
+            a: function(v) { return this.a_max - Math.abs(this.a_max * v / this.v_max) },
+            a_back: function(v) { return this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max); },
+            omega: function(v) { return Math.PI / (30 + 2 * Math.abs(v)); },
+            dteta: function(dt, v) { return this.omega(v) * dt },
+            // friction increases with velocity
+            a_friction: function(dt, v) { return Math.abs(0.04 * v) * dt; },
+            omega_friction: Math.PI / 160,
+            teta_friction: function(dt) { return this.omega_friction * dt; }
+        },
+        water: {
+            v_max: 6, // px / 16 ms
+            v_back_max: 2,
+            a_max: 0.4,
+            a_back_max: 0.4,
+            a_break: 1,
+            dx: function(v, a, dt) { return v*dt + a*dt*dt },
+            dv: function(a, dt) { return a*dt },
+            a: function(v) { return this.a_max - Math.abs(this.a_max * v / this.v_max) },
+            a_back: function(v) { return this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max); },
+            omega: function(v) { return Math.PI / (80 + 2 * Math.abs(v)); },
+            dteta: function(dt, v) { return this.omega(v) * dt },
+            // friction increases with velocity
+            a_friction: function(dt, v) { return Math.abs(0.04 * v) * dt; },
+            omega_friction: Math.PI / 160,
+            teta_friction: function(dt) { return this.omega_friction * dt; }
         },
     };
     this.texture_prefix = 'tank-';
@@ -90,15 +143,18 @@ PsycoRally.TankVehicle = function(name) {
             img: 'tank.png',
             velocity: {
                 road: 60,
-                grass: 70
+                dirt: 70,
+                water: 60
             },
             acceleration: {
                 road: 60,
-                grass: 60
+                dirt: 80,
+                water: 60
             },
             steering: {
                 road: 80,
-                grass: 80
+                dirt: 80,
+                water: 30
             }
         };
     };
