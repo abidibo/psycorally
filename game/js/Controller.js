@@ -17,7 +17,8 @@ PsycoRally.Controller = function() {
         this.stages = {
             intro: new PsycoRally.Stages.Intro(this.load.bind(this, 'choose_name')),
             choose_name: new PsycoRally.Stages.ChooseName(this.load.bind(this, 'choose_vehicle')),
-            choose_vehicle: new PsycoRally.Stages.ChooseVehicle(this.load.bind(this, 'game')),
+            choose_vehicle: new PsycoRally.Stages.ChooseVehicle(this.load.bind(this, 'choose_track')),
+            choose_track: new PsycoRally.Stages.ChooseTrack(this.load.bind(this, 'game')),
             game: new PsycoRally.Stages.Game(),
             ranking: new PsycoRally.Stages.Ranking()
         };
