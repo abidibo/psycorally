@@ -132,7 +132,7 @@ PsycoRally.Game.prototype = {
             'down': this.cursors.down.isDown,
             'up': this.cursors.up.isDown,
             'left': this.cursors.left.isDown,
-            'right': this.cursors.right.isDown
+            'right': this.cursors.right.isDown,
         }, this.terrain);
 
         // update movement data considering collisions
@@ -322,5 +322,5 @@ PsycoRally.Game.prototype = {
 
     },
     render: function() {
-    }
+    },
 }

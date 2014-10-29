@@ -229,6 +229,9 @@ PsycoRally.Vehicle = function() {
         // space increment
         var dx = this.terrain_specifications[terrain].dx(this.velocity, acceleration, dt);
 
+        if(this.velocity > 0 && dx < 0) dx = 0;
+        else if(this.velocity < 0 && dx > 0) dx = 0;
+
         // friction is determining motion round velocity to avoid never ending trip to 0
         if(!keys.down && !keys.up) {
             this.velocity = this.velocity > 0
