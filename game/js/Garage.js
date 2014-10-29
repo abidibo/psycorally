@@ -162,9 +162,91 @@ PsycoRally.TankVehicle = function(name) {
 
 PsycoRally.TankVehicle.prototype = new PsycoRally.Vehicle();
 
+PsycoRally.SteamVehicle = function(name) {
+    this.name = name;
+    this.terrain_specifications = {
+        road: {
+            v_max: 40, // px / 16 ms
+            v_back_max: 5,
+            a_max: 0.1,
+            a_back_max: 0.1,
+            a_break: 0.1,
+            dx: function(v, a, dt) { return v*dt + a*dt*dt },
+            dv: function(a, dt) { return a*dt },
+            a: function(v) { return this.a_max - Math.abs(this.a_max * v / this.v_max) },
+            a_back: function(v) { return this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max); },
+            omega: function(v) { return Math.PI / (90 + 1 * Math.abs(v)); },
+            dteta: function(dt, v) { return this.omega(v) * dt },
+            // friction increases with velocity
+            a_friction: function(dt, v) { return Math.abs(0.01 * v) * dt; },
+            omega_friction: Math.PI / 160,
+            teta_friction: function(dt) { return this.omega_friction * dt; }
+        },
+        dirt: {
+            v_max: 10, // px / 16 ms
+            v_back_max: 5,
+            a_max: 0.1,
+            a_back_max: 0.1,
+            a_break: 0.1,
+            dx: function(v, a, dt) { return v*dt + a*dt*dt },
+            dv: function(a, dt) { return a*dt },
+            a: function(v) { return this.a_max - Math.abs(this.a_max * v / this.v_max) },
+            a_back: function(v) { return this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max); },
+            omega: function(v) { return Math.PI / (90 + 1 * Math.abs(v)); },
+            dteta: function(dt, v) { return this.omega(v) * dt },
+            // friction increases with velocity
+            a_friction: function(dt, v) { return Math.abs(0.01 * v) * dt; },
+            omega_friction: Math.PI / 160,
+            teta_friction: function(dt) { return this.omega_friction * dt; }
+        },
+        water: {
+            v_max: 10, // px / 16 ms
+            v_back_max: 5,
+            a_max: 0.1,
+            a_back_max: 0.1,
+            a_break: 0.1,
+            dx: function(v, a, dt) { return v*dt + a*dt*dt },
+            dv: function(a, dt) { return a*dt },
+            a: function(v) { return this.a_max - Math.abs(this.a_max * v / this.v_max) },
+            a_back: function(v) { return this.a_back_max - Math.abs(this.a_back_max * v / this.v_back_max); },
+            omega: function(v) { return Math.PI / (90 + 1 * Math.abs(v)); },
+            dteta: function(dt, v) { return this.omega(v) * dt },
+            // friction increases with velocity
+            a_friction: function(dt, v) { return Math.abs(0.01 * v) * dt; },
+            omega_friction: Math.PI / 160,
+            teta_friction: function(dt) { return this.omega_friction * dt; }
+        },
+    };
+    this.texture_prefix = 'steam-';
+    this.getSpecifications = function() {
+        return {
+            name: this.name,
+            img: 'steam.png',
+            velocity: {
+                road: 95,
+                dirt: 75,
+                water: 75
+            },
+            acceleration: {
+                road: 20,
+                dirt: 20,
+                water: 20
+            },
+            steering: {
+                road: 10,
+                dirt: 10,
+                water: 10
+            }
+        };
+    };
+}
+
+PsycoRally.SteamVehicle.prototype = new PsycoRally.Vehicle();
+
 PsycoRally.Garage = {
     vehicles: [
         new PsycoRally.RacingVehicle('sbremba'),
-        new PsycoRally.TankVehicle('tesoterro')
+        new PsycoRally.TankVehicle('tesoterro'),
+        new PsycoRally.SteamVehicle('pilu'),
     ]
 };
