@@ -1,16 +1,16 @@
-#PsycoRally
+# PsycoRally
 
-![Screenshot](http://github.com/abidibo/psycorally/raw/master/psycorally.png)
+![Screenshot](https://raw.githubusercontent.com/abidibo/psycorally/master/psycorally.png)
 
 PsycoRally is an html5 racing game made with phaser framework
 
 Play it at http://psycorally.abidibo.net
 
-##The game
+## The game
 This is an arcade racing game. Cross the finish line in the shortest possible time. Be sure to pass through all the track partials (arrows on the road), this is the only rule.
 You can choose different vehicles, with different performance on different terrains, choose you preferred one and go fast.
 
-##Physics
+## Physics
 The vehicle motion is independent from the computer performances. Player motion is calculated considering real time intervals.
 
 The motion is calculated every small dt interval, which in the best situation is equal to 16ms (60 fps).
@@ -27,7 +27,7 @@ I've written my collide and separate functions, which are very similar to phaser
 I prefer to keep a real time motion and lose something in collisions.
 Maybe there is a way to use phaser velocity and acceleration in polar coordinates in order to have available such methods, I'll investigate.
 
-##TODO
+## TODO
 - Mobile game controller
 - change track/vehicle in ranking stage
 - Trying to use phaser physics in toto
@@ -35,5 +35,5 @@ Maybe there is a way to use phaser velocity and acceleration in polar coordinate
 - Shooting
 - Bonus/Malus
 
-##License
+## License
 This software is distributed under the MIT License, read LICENSE.md
